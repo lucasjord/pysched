@@ -1,6 +1,4 @@
       SUBROUTINE CHKDBFQ( KS, BBCBW, BBCFREQ, ERRS, VERBOSE )
-Cf2py intent(in) KS, BBCBW, BBCFREQ, VERBOSE
-Cf2py intent(in, out) ERRS
 C
 C     Routine for SCHED called by CHKDBBC and FSFREQ that checks
 C     the frequencies and bandwidths requested for the DBBC.
@@ -19,6 +17,7 @@ C     current knowledge...
 C     Removed unused variables from declarations.  Aug. 30, 2013. RCW
 C     2017-06-22 added DBBC filter 4 (1024-1536 MHz). CR
 C     2018-06-28 added DBBC filters 3 (1536-2048 MHz) and 6 (0-1024 MHz). CR
+C     2023-11-28 added 64MHz for DBBC. LJH
 C
       INCLUDE  'sched.inc'
       INCLUDE  'schset.inc'
@@ -143,21 +142,25 @@ C      **********************   Is this one true for the DBBC?
 C
 C     ===  Now check the DDC personality. ===
 C
+      IF( DEBUG ) CALL WLOG( 0, 'DDC: Starting 1' )
+      WRITE( MSGTXT, '( I8 )') KS
+      IF( DEBUG ) CALL WLOG( 1, MSGTXT )
       IF( DBE(KS) .EQ. 'DBBC_DDC' ) THEN
 C
-C        All bandwidths must be between 1 and 16 MHz. 32 MHz is
-C        available with the e-series firmware.
+C        All bandwidths must be between 1 and 64 MHz.
 C
          DO ICH = 1, NCHAN(KS)
-            IF( .NOT. ( DEQUAL( BBCBW(ICH), 32.0D0 ) .OR. 
-     2          DEQUAL( BBCBW(ICH), 16.0D0 ) .OR. 
-     3          DEQUAL( BBCBW(ICH), 8.0D0 ) .OR. 
-     4          DEQUAL( BBCBW(ICH), 4.0D0 ) .OR. 
-     5          DEQUAL( BBCBW(ICH), 2.0D0 ) .OR. 
-     6          DEQUAL( BBCBW(ICH), 1.0D0 ) ) ) THEN
+            IF( DEBUG ) CALL WLOG( 0, 'Loopin' )
+            IF( .NOT. ( DEQUAL( BBCBW(ICH), 64.0D0 ) .OR. 
+     2          DEQUAL( BBCBW(ICH), 32.0D0 ) .OR. 
+     3          DEQUAL( BBCBW(ICH), 16.0D0 ) .OR. 
+     4          DEQUAL( BBCBW(ICH), 8.0D0 ) .OR. 
+     5          DEQUAL( BBCBW(ICH), 4.0D0 ) .OR. 
+     6          DEQUAL( BBCBW(ICH), 2.0D0 ) .OR. 
+     7          DEQUAL( BBCBW(ICH), 1.0D0 ) ) ) THEN
                MSGTXT = ' '
-               WRITE( MSGTXT, '( A, A, F8.3 )' )
-     1            'CHKDBFQ: Bandwidth must be 1 to 32 MHz for ',
+               WRITE( MSGTXT, '( A, A, A )' )
+     1            'CHKDBFQ: Bandwidth must be 1 to 64 MHz for ',
      2            'DBE=DBBC_DDC. Value specified is: ', 
      3            SIDEBD(ICH,KS)
                CALL WLOG( 1, MSGTXT )
@@ -166,6 +169,7 @@ C
 C
 C           Also Sampling must be Nyquist rate.
 C
+            IF( DEBUG ) CALL WLOG( 0, 'SAMP: Starting' )
             IF( .NOT. DEQUAL(1.0D0*SAMPRATE(KS), 2.0D0*BBCBW(ICH))) THEN
                MSGTXT = ' '              
                WRITE( MSGTXT, '( A, A, F8.3, A, F8.3, A )' )
