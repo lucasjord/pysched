@@ -15,7 +15,7 @@ C
 C     Original based on CHKDBFQ, but modified by CR to the best of
 C     current knowledge...
 C     Removed unused variables from declarations.  Aug. 30, 2013. RCW
-C     2017-06-22 added DBBC filter 4 (1024-1536 MHz). CR
+C     2017-06-22 added DBBC filter 4 (1024-1536 MHz). CRs
 C     2018-06-28 added DBBC filters 3 (1536-2048 MHz) and 6 (0-1024 MHz). CR
 C     2023-11-28 added 64MHz for DBBC. LJH
 C
